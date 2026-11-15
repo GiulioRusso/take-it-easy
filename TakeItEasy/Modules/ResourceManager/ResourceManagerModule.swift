@@ -35,7 +35,7 @@ final class ResourceManagerModule: TIEModule {
 
     func quickView() -> AnyView? { AnyView(ResourceView(model: model, compact: true)) }
 
-    private func toggle() {
+    func toggle() {
         if let panel { return panel.close() }
         let panel = TransientPanel(content: ResourceView(model: model).panelChrome(width: 300))
         panel.onClose = { self.panel = nil } // close() drops this closure, breaking the cycle
@@ -114,7 +114,7 @@ private struct ResourceView: View {
         VStack(alignment: .leading, spacing: 10) {
             row(String(localized: "CPU"), "cpu", fraction: s.cpu, text: percent(s.cpu))
             row(String(localized: "Memoria"), "memorychip", fraction: Double(s.memoryUsed) / Double(max(s.memoryTotal, 1)),
-                text: "\(bytes(Int64(s.memoryUsed))) / \(bytes(Int64(s.memoryTotal)))")
+                text: memoryText(s))
             if compact {
                 DisclosureGroup(String(localized: "Dettagli"), isExpanded: Binding(get: { model.showDetails }, set: { model.showDetails = $0 })) {
                     VStack(alignment: .leading, spacing: 10) { details(s) }.padding(.top, 6)
@@ -234,7 +234,7 @@ private struct ResourceView: View {
         labeled(title, symbol) {
             HStack {
                 ProgressView(value: min(max(fraction ?? 0, 0), 1)).tint(color(fraction ?? 0)).controlSize(.small)
-                Text(text).monospacedDigit().frame(minWidth: 90, alignment: .trailing)
+                Text(text).monospacedDigit().lineLimit(1).fixedSize().frame(minWidth: 90, alignment: .trailing)
             }
         }
     }
@@ -251,6 +251,14 @@ private struct ResourceView: View {
     private func color(_ load: Double) -> Color { load > 0.85 ? .red : load > 0.6 ? .orange : .accentColor }
 
     private func percent(_ value: Double?) -> String { value.map { "\(Int(($0 * 100).rounded()))%" } ?? "—" }
+
+    /// "12.8 / 16 GB": short enough to sit next to the bar.
+    private func memoryText(_ s: ResourceSnapshot) -> String {
+        let gb = Double(1 << 30)
+        let used = (Double(s.memoryUsed) / gb).formatted(.number.precision(.fractionLength(1)))
+        let total = (Double(s.memoryTotal) / gb).formatted(.number.precision(.fractionLength(0)))
+        return "\(used) / \(total) GB"
+    }
 
     private func bytes(_ value: Int64) -> String { value.formatted(.byteCount(style: .memory)) }
 

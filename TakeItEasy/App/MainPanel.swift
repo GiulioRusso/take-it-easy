@@ -15,7 +15,7 @@ final class MainPanel {
         item = StatusItem(symbol: "wrench.and.screwdriver", accessibilityName: "take-it-easy") { [weak self] in self?.toggle() }
     }
 
-    private func toggle() {
+    func toggle() {
         if let panel { return panel.close() }
         let view = MainPanelView(registry: registry) { [weak self] moduleID in
             self?.panel?.close()

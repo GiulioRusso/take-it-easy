@@ -78,6 +78,14 @@ final class ModuleRegistry {
         }
     }
 
+    #if DEBUG
+    /// Screenshot tour: shows the module as on (and running, if `start`), without saving or asking permissions.
+    func startForScreenshots(_ module: any TIEModule, start: Bool) {
+        enabled.insert(module.id)
+        if start { self.start(module) } else { running.insert(module.id) }
+    }
+    #endif
+
     private func persist() {
         UserDefaults.standard.set(Array(enabled).sorted(), forKey: Self.defaultsKey)
     }

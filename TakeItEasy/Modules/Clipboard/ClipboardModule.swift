@@ -54,7 +54,21 @@ final class ClipboardModule: TIEModule {
 
     func quickView() -> AnyView? { AnyView(ClipboardQuickView(history: history)) }
 
-    private func toggle() {
+    #if DEBUG
+    /// Screenshot tour: sample clips instead of the real history (nothing is read or saved).
+    func startDemo() {
+        history.showDemo([
+            Clip(text: "brew install gh", date: .now.addingTimeInterval(-40)),
+            Clip(text: "#4F8CFF", date: .now.addingTimeInterval(-300)),
+            Clip(text: "https://github.com/take-it-easy/releases", date: .now.addingTimeInterval(-1_200)),
+            Clip(text: "Ship v1.0 on Friday, then take it easy 🌴", date: .now.addingTimeInterval(-5_400)),
+            Clip(text: "Meeting notes: per-app volume, eyedropper, keyboard cleaning", date: .now.addingTimeInterval(-86_000)),
+            Clip(text: "ssh build@studio.local", date: .now.addingTimeInterval(-200_000), pinned: true),
+        ])
+    }
+    #endif
+
+    func toggle() {
         if let panel { return panel.close() }
         let state = ClipboardPanelState()
         let paste: (Clip, Bool) -> Void = { [weak self] clip, plain in
@@ -150,6 +164,10 @@ final class ClipboardHistory {
             return unpinned <= limit
         }
     }
+
+    #if DEBUG
+    func showDemo(_ clips: [Clip]) { self.clips = clips }
+    #endif
 
     func togglePin(_ clip: Clip) {
         guard let i = clips.firstIndex(where: { $0.id == clip.id }) else { return }

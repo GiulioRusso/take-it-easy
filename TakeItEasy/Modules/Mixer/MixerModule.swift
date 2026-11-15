@@ -66,7 +66,7 @@ final class MixerModule: TIEModule {
         AnyView(MixerView(model: model, compact: true).onAppear { [model] in model.refresh() })
     }
 
-    private func toggle() {
+    func toggle() {
         if let panel {
             panel.close()
             return

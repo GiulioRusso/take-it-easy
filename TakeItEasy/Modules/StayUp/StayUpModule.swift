@@ -40,7 +40,7 @@ final class StayUpModule: TIEModule {
 
     func quickView() -> AnyView? { AnyView(StayUpView(model: model, compact: true)) }
 
-    private func toggle() {
+    func toggle() {
         if let panel { return panel.close() }
         let panel = TransientPanel(content: StayUpView(model: model) { [weak self] in self?.panel?.close() }.panelChrome(width: 240))
         panel.onClose = { self.panel = nil } // close() drops this closure, breaking the cycle

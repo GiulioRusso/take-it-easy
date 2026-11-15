@@ -281,7 +281,15 @@ nonisolated final class ResourceSampler: @unchecked Sendable {
     // MARK: Bluetooth batteries
 
     /// Every 30 s: `system_profiler` takes ~0.15 s and battery levels move slowly.
+    #if DEBUG
+    /// Screenshot tour: fixed devices instead of the user's (their names often include the owner's name).
+    nonisolated(unsafe) static var demoBatteries: [ResourceSnapshot.Battery]?
+    #endif
+
     private func batteries() -> [ResourceSnapshot.Battery] {
+        #if DEBUG
+        if let demo = Self.demoBatteries { return demo }
+        #endif
         if let lastBatteries, Date().timeIntervalSince(lastBatteries.time) < 30 { return lastBatteries.value }
         let value = Self.readBatteries()
         lastBatteries = (value, Date())

@@ -21,7 +21,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         let settings = SettingsWindow(registry: registry)
         self.settings = settings
-        mainPanel = MainPanel(registry: registry, settings: settings)
+        let mainPanel = MainPanel(registry: registry, settings: settings)
+        self.mainPanel = mainPanel
+        #if DEBUG
+        ScreenshotTour.runIfRequested(registry: registry, mainPanel: mainPanel, settings: settings)
+        #endif
     }
 
     func applicationWillTerminate(_ notification: Notification) {

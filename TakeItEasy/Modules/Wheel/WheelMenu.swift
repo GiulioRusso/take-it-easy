@@ -227,7 +227,7 @@ private struct WheelView: View {
         }
         .foregroundStyle(highlighted ? Color.white : Color.primary)
         .opacity(item.isEnabled ? 1 : 0.3)
-        .frame(width: 64)
+        .frame(width: 56) // narrower than the slice at that radius: long titles shrink instead of touching the edges
         .position(p)
     }
 
