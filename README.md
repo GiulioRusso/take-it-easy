@@ -231,7 +231,7 @@ launch) would require one.
 | Asset | Regenerate with |
 |---|---|
 | App icon (`Assets.xcassets/AppIcon`, `docs/icon.png`) | `swift scripts/make-icon.swift` |
-| README screenshots (`docs/screenshots/`) | Debug build, then `open -n <DerivedData>/TakeItEasy.app --args -enabledModules "()" -TIEScreenshots "$PWD/docs/screenshots"` |
+| README screenshots (`docs/screenshots/`) | Debug build, then `open -n "<DerivedData>/TakeItEasy Dev.app" --args -enabledModules "()" -TIEScreenshots "$PWD/docs/screenshots"` |
 
 The screenshot tour (DEBUG builds only) opens each panel with demo data (no real clipboard contents or device
 names), captures only the app's own windows and puts them on the icon's gradient. Don't touch the mouse while
@@ -245,6 +245,7 @@ it runs (~15 s).
 - CLI build: `xcodebuild -project TakeItEasy.xcodeproj -scheme TakeItEasy -configuration Debug build`
 - Only dependency: [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts).
 - Project rules for contributors and AI assistants: [`CLAUDE.md`](CLAUDE.md).
-- Permissions can be invalidated after a rebuild: `tccutil reset All russogiulio.TakeItEasy` and grant again.
-  Xcode builds are signed with the development certificate and releases with the self-signed one,
-  so on your own Mac the two "steal" permissions from each other.
+- Debug builds are a separate app, **TakeItEasy Dev** (`russogiulio.TakeItEasy.dev`), so they never share
+  or clash with the permissions of the released app installed in Applications.
+- Permissions of the dev build can be invalidated after a rebuild:
+  `tccutil reset All russogiulio.TakeItEasy.dev` and grant again.

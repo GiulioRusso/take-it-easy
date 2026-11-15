@@ -13,7 +13,7 @@ App macOS da menu bar, modulare. Leggi `PLAN.md` prima di ogni task: architettur
   `xcodebuild -project TakeItEasy.xcodeproj -scheme TakeItEasy -configuration Debug build`
 - Se la build fallisce, leggi l'errore e correggi; non lasciare codice che non compila.
 - Permessi (Accessibilità, Registrazione schermo, Automazione Finder, Registrazione audio) non sono testabili da terminale: alla fine di ogni task scrivi una checklist di test manuali.
-- Ricorda all'utente che dopo una ricompilazione i permessi TCC possono invalidarsi: `tccutil reset All <bundle-id>` e riconcederli.
+- Ricorda all'utente che dopo una ricompilazione i permessi TCC possono invalidarsi: `tccutil reset All russogiulio.TakeItEasy.dev` (build Debug, app «TakeItEasy Dev»; la release in Applicazioni è `russogiulio.TakeItEasy`) e riconcederli.
 
 ## Regole di codice
 - Ogni modulo vive in `Modules/<Nome>/` e implementa `TIEModule`. Nessun modulo importa un altro modulo; il codice condiviso sta in `Core/`.
