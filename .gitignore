@@ -1,0 +1,6 @@
+.DS_Store
+build/
+xcuserdata/
+# Code signing key: never commit
+*.p12
+*.pem
