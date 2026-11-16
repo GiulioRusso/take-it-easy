@@ -24,14 +24,16 @@ final class WindowBubble {
     var isVisible: Bool { panel.isVisible }
 
     /// Loads `app`'s windows and shows them next to `anchor` (AppKit coordinates).
-    /// Windows that can't be captured (other Spaces, invisible helpers) are left out.
+    /// Windows that can't be captured (invisible helpers) are left out.
+    /// `otherSpaces`: also list titled windows on other Spaces (a placeholder if they can't be captured).
     /// `takesKeyboard`: make the bubble key once visible (Glance's type-to-filter).
-    func show(_ app: NSRunningApplication, anchor: CGRect, edge: BubbleEdge, takesKeyboard: Bool = false) async {
+    func show(_ app: NSRunningApplication, anchor: CGRect, edge: BubbleEdge, otherSpaces: Bool = false,
+              takesKeyboard: Bool = false) async {
         generation += 1
         let token = generation
         self.anchor = anchor
         guard let windows = try? await WindowCatalog.windows(of: [app.processIdentifier]), token == generation else { return }
-        let shown = windows.filter(\.isShowable)
+        let shown = windows.filter { $0.isShowable || (otherSpaces && $0.isOnOtherSpaceListable) }
             .map { window -> CatalogWindow in
                 var window = window
                 window.image = cache[window.id]
@@ -47,7 +49,7 @@ final class WindowBubble {
             if let image {
                 cache[window.id] = image
                 model.setImage(image, for: window.id)
-            } else {
+            } else if !window.onOtherSpace {
                 remove(window.id)
             }
         }
@@ -207,9 +209,12 @@ private struct BubbleView: View {
                     }
                 }
                 .frame(width: Self.thumb.width, height: Self.thumb.height)
-                .opacity(window.minimized ? 0.55 : 1)
+                .opacity(window.minimized || window.onOtherSpace ? 0.55 : 1)
                 if window.minimized {
                     Image(systemName: "minus.circle.fill").foregroundStyle(.yellow).padding(4)
+                } else if window.onOtherSpace {
+                    Image(systemName: "rectangle.on.rectangle").font(.caption).padding(5)
+                        .help(String(localized: "Su un'altra scrivania"))
                 }
             }
             Text(window.title).font(.caption).lineLimit(1).frame(width: Self.thumb.width)

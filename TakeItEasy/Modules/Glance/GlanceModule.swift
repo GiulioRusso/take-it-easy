@@ -63,7 +63,7 @@ final class GlanceModule: TIEModule {
             let bottomLeft = AX.appKitPoint(CGPoint(x: iconFrame.minX, y: iconFrame.maxY))
             let anchor = CGRect(origin: bottomLeft, size: iconFrame.size)
             startWatching() // hides if the cursor leaves before the bubble appears, too
-            await bubble.show(app, anchor: anchor, edge: Self.dockEdge, takesKeyboard: true) // typing filters by title
+            await bubble.show(app, anchor: anchor, edge: Self.dockEdge, otherSpaces: true, takesKeyboard: true) // typing filters by title
         }
     }
 

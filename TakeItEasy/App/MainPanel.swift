@@ -34,6 +34,9 @@ private struct MainPanelView: View {
     let openSettings: (String?) -> Void
 
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 4)
+    @State private var quickHeight: CGFloat = 0
+    /// Screen height minus header, tiles and margins.
+    private var maxQuickHeight: CGFloat { max(200, (NSScreen.main?.visibleFrame.height ?? 800) - 300) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -47,19 +50,29 @@ private struct MainPanelView: View {
             }
             .buttonStyle(.borderless)
 
-            ForEach(registry.modules.filter { registry.running.contains($0.id) }, id: \.id) { module in
-                if let quick = module.quickView() {
-                    quick
-                        .padding(10)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
-                }
-            }
-
             LazyVGrid(columns: columns, spacing: 10) {
                 ForEach(registry.modules, id: \.id) { module in
                     ModuleTile(module: module, registry: registry) { openSettings(module.id) }
                 }
+            }
+
+            // Tiles stay on top, always reachable; the quick controls scroll once taller than the screen allows.
+            let quick = registry.modules.filter { registry.running.contains($0.id) }.compactMap { m in m.quickView().map { (m.id, $0) } }
+            if !quick.isEmpty {
+                Divider()
+                ScrollView {
+                    VStack(spacing: 12) {
+                        ForEach(quick, id: \.0) { _, view in
+                            view
+                                .padding(10)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 10))
+                        }
+                    }
+                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { quickHeight = $0 }
+                }
+                .scrollBounceBehavior(.basedOnSize)
+                .frame(height: min(quickHeight, maxQuickHeight))
             }
         }
         .panelChrome(width: 360)
